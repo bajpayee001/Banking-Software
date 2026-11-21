@@ -27,6 +27,7 @@ flowchart TD
 ```mermaid
 erDiagram
     CUSTOMER ||--o{ ACCOUNT : "owns"
+    CUSTOMER ||--o{ APP_USER : "authenticates"
     ACCOUNT ||--o{ TRANSACTION : "source_account"
     ACCOUNT ||--o{ TRANSACTION : "destination_account"
     TRANSACTION ||--o{ TRANSACTION_AUDIT : "generates"
@@ -39,6 +40,19 @@ erDiagram
         varchar email UK
         varchar phone
         timestamp created_at
+    }
+
+    APP_USER {
+        varchar user_id PK
+        varchar username UK
+        varchar email UK
+        varchar password
+        varchar role "ROLE_USER, ROLE_ADMIN"
+        varchar customer_id FK
+        boolean two_factor_enabled
+        varchar two_factor_secret
+        timestamp created_at
+        timestamp updated_at
     }
 
     ACCOUNT {
@@ -162,11 +176,12 @@ http://localhost:8080
 
 ```
 bank-transaction-system/
-├── build.gradle
-├── pom.xml
+├── pom.xml                                   # Root Maven Configuration
+├── build.gradle                              # Gradle Build Configuration
 ├── settings.gradle
-├── DESIGN_NOTE.md
-├── README.md
+├── MASTER-PLAN-15-DAYS.md                    # Single Definitive 15-Day Roadmap (Phase-wise)
+├── DESIGN_NOTE.md                            # Locking, Concurrency, and Indexing Rationale
+├── README.md                                 # Full Setup & Demonstration Guide
 └── src/
     ├── main/
     │   ├── java/com/bank/transaction/
@@ -182,7 +197,20 @@ bank-transaction-system/
     │   │   ├── dto/
     │   │   ├── exception/
     │   │   ├── model/
+    │   │   │   ├── Customer.java
+    │   │   │   ├── Account.java
+    │   │   │   ├── User.java
+    │   │   │   ├── Role.java
+    │   │   │   ├── Transaction.java
+    │   │   │   ├── TransactionAudit.java
+    │   │   │   └── FailedTransaction.java
     │   │   ├── repository/
+    │   │   │   ├── CustomerRepository.java
+    │   │   │   ├── AccountRepository.java
+    │   │   │   ├── UserRepository.java
+    │   │   │   ├── TransactionRepository.java
+    │   │   │   ├── TransactionAuditRepository.java
+    │   │   │   └── FailedTransactionRepository.java
     │   │   └── service/
     │   │       ├── AccountLockManager.java
     │   │       ├── AuditService.java
@@ -204,6 +232,8 @@ bank-transaction-system/
     │           └── js/app.js
     └── test/
         └── java/com/bank/transaction/
+            ├── Day1FoundationTest.java
+            ├── Day2DataAccessTest.java
             ├── IdempotencyTest.java
             ├── MandatoryConcurrencyTest.java
             └── TransferDeadlockTest.java

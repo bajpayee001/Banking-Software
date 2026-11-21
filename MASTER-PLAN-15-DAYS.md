@@ -58,8 +58,8 @@ bank-transaction-system/
 
 ## 📅 Day-by-Day Execution Plan
 
-### Phase 1: 🏗️ Foundation (Days 1–2)
-- **Day 1: Database Schema, Relational Constraints, and Core JPA Entities**
+### Phase 1: 🏗️ Foundation (Days 1–2) — [COMPLETED ✅]
+- **Day 1: Database Schema, Relational Constraints, and Core JPA Entities — [DONE ✅]**
   - **Estimated Time:** 4–5 hours | **Priority:** P0 (Must Have)
   - **Tasks:**
     1. Define Maven `pom.xml` with Spring Boot 3.3.5, JPA, Validation, H2, PostgreSQL, JUnit 5.
@@ -68,11 +68,19 @@ bank-transaction-system/
     4. Create workload-justified indexes (`customer_id`, `account_number`, `source_account`, `created_at`).
     5. Implement JPA Entities (`Customer`, `Account`, `AccountStatus`, `Transaction`, `TransactionType`, `TransactionStatus`, `TransactionAudit`, `FailedTransaction`).
     6. Implement Spring Data JPA repositories with custom query methods.
-  - **Checkpoint Day 1:** `Day1FoundationTest` passes — Schema deploys cleanly, constraints enforce negative balance prevention, entities map without errors.
-  - **Daily Git Commit:** `feat(phase-1): day 1 - database schema, jpa entities, repositories, and master plan`
+  - **Checkpoint Day 1:** `Day1FoundationTest` passes — Schema deploys cleanly, constraints enforce negative balance prevention, entities map without errors. (Passed 100%)
+  - **Daily Git Commit:** `feat(phase-1): day 1 - database schema, jpa entities, repositories, and master plan` (`504caf6`)
 
-- **Day 2: Seed Data, Repository Queries & Basic Data Access Layer Verification**
+- **Day 2: Seed Data, Repository Queries & Basic Data Access Layer Verification — [DONE ✅]**
   - **Estimated Time:** 3–4 hours | **Priority:** P0 (Must Have)
+  - **Tasks:**
+    1. Populate `seed.sql` with multi-channel test accounts (active, frozen, zero balance, high net-worth).
+    2. Add specific test account `ACC1001` with exactly ₹10,000 for mandatory concurrency test.
+    3. Add `APP_USER` table and `User`, `Role` entities for User & Admin authentication groundwork.
+    4. Implement custom repository queries for account lookups, customer transaction histories, and atomic balance updates.
+    5. Verify Spring Boot context startup, database seed loading, and automated repository tests (`Day2DataAccessTest`).
+  - **Checkpoint Day 2:** All seed records loaded and verified via automated repository tests; custom SQL queries for transaction history by customer, account search, and balance assertions execute cleanly. (Passed 100%)
+  - **Daily Git Commit:** `feat(phase-1): day 2 - seed dataset, custom repository queries, user schema groundwork, and data access tests` (`4a380e0`)
   - **Tasks:**
     1. Populate `seed.sql` with multi-channel test accounts (active, frozen, zero balance, high net-worth).
     2. Add specific test account `ACC1001` with exactly ₹10,000 for mandatory concurrency test.
