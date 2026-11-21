@@ -1,6 +1,7 @@
 package com.bank.transaction.repository;
 
 import com.bank.transaction.model.Account;
+import com.bank.transaction.model.AccountStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -20,6 +21,12 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     List<Account> findByCustomerCustomerId(String customerId);
 
+    List<Account> findByStatus(AccountStatus status);
+
+    long countByStatus(AccountStatus status);
+
+    List<Account> findTop10ByOrderByBalanceDesc();
+
     /**
      * Pessimistic Write Lock: Acquires row-level lock using 'SELECT ... FOR UPDATE'.
      * Prevents dirty reads, non-repeatable reads, and lost updates across concurrent threads.
@@ -32,11 +39,11 @@ public interface AccountRepository extends JpaRepository<Account, String> {
      * Atomic SQL update variant: guaranteed to execute atomically at the database engine level.
      * Prevents negative balance check violations directly via SQL predicate 'balance >= :amount'.
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Account a SET a.balance = a.balance - :amount, a.updatedAt = CURRENT_TIMESTAMP WHERE a.accountId = :accountId AND a.balance >= :amount")
     int debitAtomic(@Param("accountId") String accountId, @Param("amount") BigDecimal amount);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Account a SET a.balance = a.balance + :amount, a.updatedAt = CURRENT_TIMESTAMP WHERE a.accountId = :accountId")
     int creditAtomic(@Param("accountId") String accountId, @Param("amount") BigDecimal amount);
 }
