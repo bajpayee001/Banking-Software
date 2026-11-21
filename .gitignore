@@ -1,5 +1,8 @@
 .gradle/
 build/
+target/
 .idea/
 *.iml
 .DS_Store
+PHASE_WISE_EXECUTION_AND_SUBMISSION_REPORT.md
+
