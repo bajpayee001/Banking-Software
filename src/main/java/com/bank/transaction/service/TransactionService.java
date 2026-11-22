@@ -1,13 +1,16 @@
 package com.bank.transaction.service;
 
+import com.bank.transaction.dto.FraudAssessmentResult;
 import com.bank.transaction.dto.TransactionRequest;
 import com.bank.transaction.dto.TransactionResponse;
 import com.bank.transaction.exception.*;
 import com.bank.transaction.model.*;
 import com.bank.transaction.repository.AccountRepository;
 import com.bank.transaction.repository.TransactionRepository;
+import com.bank.transaction.service.ai.FraudDetectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -26,6 +29,7 @@ public class TransactionService {
     private final ValidationService validationService;
     private final AccountLockManager lockManager;
     private final AuditService auditService;
+    private final FraudDetectionService fraudService;
     private final TransactionTemplate transactionTemplate;
 
     public TransactionService(AccountRepository accountRepository,
@@ -33,12 +37,14 @@ public class TransactionService {
                               ValidationService validationService,
                               AccountLockManager lockManager,
                               AuditService auditService,
+                              FraudDetectionService fraudService,
                               PlatformTransactionManager transactionManager) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.validationService = validationService;
         this.lockManager = lockManager;
         this.auditService = auditService;
+        this.fraudService = fraudService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
     }
@@ -64,6 +70,17 @@ public class TransactionService {
         try {
             // Step 2: Validate Request
             validationService.validateRequest(request);
+
+            // Step 2.5: AI Pre-Commit Anomaly & Fraud Assessment
+            FraudAssessmentResult fraudResult = fraudService.assessRisk(request);
+            if (fraudResult.fraudFlagged()) {
+                throw new BankingException(
+                        "Transaction intercepted by AI Fraud Engine: " + String.join("; ", fraudResult.riskFactors()),
+                        "ERR_FRAUD_DETECTED",
+                        "SECURITY_FRAUD_RISK",
+                        HttpStatus.FORBIDDEN
+                );
+            }
 
             // Step 3: Check Idempotency
             if (transactionRepository.existsById(request.getTransactionId())) {

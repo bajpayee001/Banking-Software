@@ -20,7 +20,7 @@
         <div class="nav-actions">
             <div class="badge-live">
                 <span class="pulse-dot"></span>
-                <span>ENGINE ACTIVE (PORT 8080)</span>
+                <span>ENGINE ACTIVE (PORT 8085)</span>
             </div>
             <button class="btn btn-secondary" onclick="loadAllData()">🔄 Refresh</button>
         </div>
@@ -35,6 +35,7 @@
             <button class="tab-btn" onclick="switchTab('tab-benchmark')">🚀 50,000+ Benchmark Suite</button>
             <button class="tab-btn" onclick="switchTab('tab-reports')">📊 SQL Reports & EXPLAIN</button>
             <button class="tab-btn" onclick="switchTab('tab-audit')">📜 Audit & Failure Logs</button>
+            <button class="tab-btn" onclick="switchTab('tab-ai')">🤖 AI Banking Innovations</button>
         </nav>
 
         <!-- TAB 1: Accounts & Balances -->
@@ -270,6 +271,119 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: AI Banking Innovations (Suggestions 1, 3, 4) -->
+        <section id="tab-ai" class="tab-content">
+            <!-- AI Feature 1: Fraud & Anomaly Detection -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>🛡️</span> AI Innovation 1: Real-Time Pre-Commit Fraud & Anomaly Detection</h2>
+                    <span class="tag tag-success">MULTI-FEATURE RISK SCORING</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Scans transactions before database locking. Evaluates rapid velocity bursts, abnormal monetary thresholds, and complete account draining anomalies. Risk scores &ge; 0.85 are immediately intercepted.
+                </p>
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label>Test Target Account</label>
+                            <input type="text" id="ai-fraud-acc" class="form-control" value="ACC1001">
+                        </div>
+                        <div class="form-group">
+                            <label>Test Amount (₹)</label>
+                            <input type="number" id="ai-fraud-amount" class="form-control" value="120000.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Transaction Type</label>
+                            <select id="ai-fraud-type" class="form-control">
+                                <option value="WITHDRAWAL">WITHDRAWAL</option>
+                                <option value="TRANSFER">TRANSFER</option>
+                                <option value="DEPOSIT">DEPOSIT</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" onclick="runAiFraudAssessment()">Assess Risk with AI Model</button>
+                    </div>
+                    <div id="ai-fraud-result-box" style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem;">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Assessment Telemetry</h4>
+                        <div id="ai-fraud-score-display" style="font-size: 1.5rem; font-weight: 800; color: #64748b; margin-bottom: 0.5rem;">
+                            Score: -- / 1.00
+                        </div>
+                        <div id="ai-fraud-factors" style="font-size: 0.88rem; color: #334155;">
+                            Click "Assess Risk" to test multi-feature anomaly scoring.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Feature 3: Intelligent High-Contention Batcher -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>⚡</span> AI Innovation 3: Intelligent High-Contention Dynamic Batcher</h2>
+                    <span class="tag tag-warning">ROW-LOCK COLLAPSING</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    When multiple concurrent threads compete for the same "hot account" row-lock, competitive execution degrades throughput. The AI Contention Router dynamically batches operations into a single atomic balance update, multiplying TPS.
+                </p>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.25rem;">
+                    <label style="font-weight: 600;">Contention Target:</label>
+                    <input type="text" id="ai-contention-acc" class="form-control" value="ACC2004" style="width: 130px;">
+                    <label style="font-weight: 600;">Concurrent Deposits:</label>
+                    <select id="ai-contention-count" class="form-control" style="width: 150px;">
+                        <option value="20">20 Requests</option>
+                        <option value="40" selected>40 Requests</option>
+                        <option value="80">80 Requests</option>
+                    </select>
+                    <button class="btn btn-success" id="btn-contention-run" onclick="runContentionComparison()">
+                        ⚡ Run Contention Speedup Test
+                    </button>
+                    <span id="ai-contention-spinner" style="display: none; color: var(--accent); font-weight: 600;">Processing...</span>
+                </div>
+                <div id="ai-contention-results" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.25rem;">
+                    <h3 id="ai-contention-summary" style="color: #1e40af; margin-bottom: 0.75rem; font-size: 1.1rem;"></h3>
+                    <div class="thread-result-box" style="margin-top: 0.5rem;">
+                        <div class="thread-card" style="background: #fff;">
+                            <strong>Standard Competitive Threads:</strong>
+                            <div id="ai-standard-stats" style="margin-top: 0.4rem; font-size: 0.9rem;"></div>
+                        </div>
+                        <div class="thread-card winner">
+                            <strong>AI Intelligent Batched Execution:</strong>
+                            <div id="ai-batched-stats" style="margin-top: 0.4rem; font-size: 0.9rem;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Feature 4: Autonomous SQL Optimizer -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>🧠</span> AI Innovation 4: Autonomous SQL Index & Query Plan Optimizer</h2>
+                    <button class="btn btn-secondary" onclick="runAiSqlOptimizer()">Run Autonomous Diagnosis</button>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+                    Autonomous agent that parses live <code>EXPLAIN</code> plans across all 5 reporting queries, detects table scan risks, and outputs index tuning actions.
+                </p>
+                <div id="ai-sql-diagnoses-container" class="table-container">
+                    <table id="ai-sql-table">
+                        <thead>
+                            <tr>
+                                <th>Query Target</th>
+                                <th>Execution Path</th>
+                                <th>Est. Cost</th>
+                                <th>AI Diagnosis</th>
+                                <th>Recommended Tuning Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ai-sql-tbody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                                    Click "Run Autonomous Diagnosis" to evaluate query execution plans.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>

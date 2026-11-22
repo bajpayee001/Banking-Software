@@ -431,3 +431,108 @@ function appendChatMessage(sender, text, suggestions = []) {
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
 }
+
+// 8. AI Innovations Lab Handlers
+
+async function runAiFraudAssessment() {
+    const acc = document.getElementById("ai-fraud-acc").value.trim();
+    const amount = parseFloat(document.getElementById("ai-fraud-amount").value);
+    const type = document.getElementById("ai-fraud-type").value;
+    const scoreDisplay = document.getElementById("ai-fraud-score-display");
+    const factorsDisplay = document.getElementById("ai-fraud-factors");
+
+    const payload = {
+        transactionId: "TXN-FRAUD-TEST-" + Date.now().toString().slice(-4),
+        sourceAccount: acc,
+        destinationAccount: null,
+        amount: amount,
+        type: type
+    };
+
+    try {
+        const res = await fetch("/api/ai/fraud/assess", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        scoreDisplay.innerHTML = `Risk Score: <strong style="color: ${data.fraudFlagged ? '#ef4444' : (data.riskScore >= 0.5 ? '#f59e0b' : '#10b981')}">${data.riskScore} / 1.00</strong> [${data.riskLevel}]`;
+        
+        let factorsHtml = `<strong>Status:</strong> ${data.fraudFlagged ? '⛔ FLAGGED AS FRAUD (Transaction Intercepted)' : '✅ APPROVED (Low Risk)'}<br><br><strong>Detected Factors:</strong><ul style="margin-left:1.2rem; margin-top:0.3rem;">`;
+        data.riskFactors.forEach(f => {
+            factorsHtml += `<li>${f}</li>`;
+        });
+        factorsHtml += `</ul>`;
+
+        factorsDisplay.innerHTML = factorsHtml;
+    } catch (err) {
+        alert("Failed to run AI fraud check: " + err);
+    }
+}
+
+async function runContentionComparison() {
+    const acc = document.getElementById("ai-contention-acc").value.trim();
+    const count = document.getElementById("ai-contention-count").value;
+    const btn = document.getElementById("btn-contention-run");
+    const spinner = document.getElementById("ai-contention-spinner");
+    const container = document.getElementById("ai-contention-results");
+    const summary = document.getElementById("ai-contention-summary");
+    const stdStats = document.getElementById("ai-standard-stats");
+    const batchedStats = document.getElementById("ai-batched-stats");
+
+    btn.disabled = true;
+    spinner.style.display = "inline";
+
+    try {
+        const res = await fetch(`/api/ai/contention/batch-run?account=${acc}&count=${count}`, { method: "POST" });
+        const data = await res.json();
+
+        container.style.display = "block";
+        summary.textContent = `🚀 Contention Speedup Achieved: ${data.speedupFactor}x Faster!`;
+
+        stdStats.innerHTML = `
+            Time: <strong>${data.standardProcessingTimeMs} ms</strong><br>
+            Throughput: <strong>${data.standardTps} TPS</strong><br>
+            Bottleneck: Row-level lock contention on hot account (${data.totalRequestsInBatch} individual roundtrips)
+        `;
+
+        batchedStats.innerHTML = `
+            Time: <strong>${data.aiBatchedProcessingTimeMs} ms</strong><br>
+            Throughput: <strong style="color:#15803d; font-size:1.1rem;">${data.aiBatchedTps} TPS</strong><br>
+            Optimization: Collapsed into 1 atomic batch balance update of ₹${data.totalBatchedAmount}
+        `;
+
+        loadAccounts();
+    } catch (err) {
+        alert("Failed to run contention comparison: " + err);
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = "none";
+    }
+}
+
+async function runAiSqlOptimizer() {
+    const tbody = document.getElementById("ai-sql-tbody");
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">⏳ Diagnosing SQL query plans...</td></tr>`;
+
+    try {
+        const res = await fetch("/api/ai/sql-optimizer/diagnose");
+        const data = await res.json();
+
+        tbody.innerHTML = "";
+        data.diagnoses.forEach(diag => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${diag.queryTitle}</strong></td>
+                <td><span class="tag tag-success">${diag.scanTypeDetected}</span></td>
+                <td><strong>${diag.estimatedScanCost}</strong></td>
+                <td style="font-size:0.85rem; color:#334155;">${diag.aiDiagnosis}</td>
+                <td style="font-size:0.85rem; color:#0369a1;"><strong>${diag.recommendedAction}</strong></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:red;">Error diagnosing queries: ${err.message}</td></tr>`;
+    }
+}

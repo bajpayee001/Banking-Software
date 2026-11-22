@@ -6,11 +6,9 @@ plugins {
 
 group = 'com.bank'
 version = '1.0.0'
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
 
 repositories {
     mavenCentral()
