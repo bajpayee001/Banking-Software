@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Threaded Banking Transaction Processing System</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="brand">
+            <span class="brand-icon">🏛️</span>
+            <div class="brand-text">
+                <h1>Banking Transaction Engine</h1>
+                <p>High-Volume Multi-Threaded Core Banking Service (Java 17+ • SQL • Concurrency)</p>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <div class="badge-live">
+                <span class="pulse-dot"></span>
+                <span>ENGINE ACTIVE (PORT 8080)</span>
+            </div>
+            <button class="btn btn-secondary" onclick="loadAllData()">🔄 Refresh</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Tab Navigation -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('tab-accounts')">💳 Accounts & Balances</button>
+            <button class="tab-btn" onclick="switchTab('tab-execute')">💸 Execute Transaction</button>
+            <button class="tab-btn" onclick="switchTab('tab-concurrency')">⚡ Mandatory Concurrency Test</button>
+            <button class="tab-btn" onclick="switchTab('tab-benchmark')">🚀 50,000+ Benchmark Suite</button>
+            <button class="tab-btn" onclick="switchTab('tab-reports')">📊 SQL Reports & EXPLAIN</button>
+            <button class="tab-btn" onclick="switchTab('tab-audit')">📜 Audit & Failure Logs</button>
+        </nav>
+
+        <!-- TAB 1: Accounts & Balances -->
+        <section id="tab-accounts" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>🏦</span> Customer Accounts & Real-Time Balances</h2>
+                    <div>
+                        <button class="btn btn-secondary" onclick="resetAcc1001()">Reset ACC1001 to ₹10,000</button>
+                    </div>
+                </div>
+                <div id="accounts-grid" class="grid-3">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Execute Transaction -->
+        <section id="tab-execute" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><span>⚡</span> Submit Transaction</h2>
+                    </div>
+                    <form id="txn-form" onsubmit="handleTransactionSubmit(event)">
+                        <div class="form-group">
+                            <label for="txn-type">Transaction Type</label>
+                            <select id="txn-type" class="form-control" onchange="toggleAccountInputs()">
+                                <option value="TRANSFER">TRANSFER (Account to Account)</option>
+                                <option value="WITHDRAWAL">WITHDRAWAL (Debit)</option>
+                                <option value="DEPOSIT">DEPOSIT (Credit)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="txn-id">Transaction ID (Idempotency Key)</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="txn-id" class="form-control" required placeholder="TXN100234">
+                                <button type="button" class="btn btn-secondary" onclick="generateRandomTxnId()">Gen</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="group-source-acc">
+                            <label for="txn-source">Source Account</label>
+                            <select id="txn-source" class="form-control">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="group-dest-acc">
+                            <label for="txn-dest">Destination Account</label>
+                            <select id="txn-dest" class="form-control">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="txn-amount">Amount (₹)</label>
+                            <input type="number" step="0.01" min="0.01" id="txn-amount" class="form-control" required placeholder="12500.00">
+                        </div>
+
+                        <button type="submit" class="btn btn-success" style="width: 100%;">Execute Transaction</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><span>📋</span> Execution Outcome</h2>
+                    </div>
+                    <div id="txn-result-banner" style="display: none; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <!-- Dynamic Result Display -->
+                    </div>
+                    <div id="txn-response-json" style="background: #0f172a; color: #38bdf8; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; max-height: 280px; overflow-y: auto;">
+                        // Submit a transaction to see immediate response payload and execution telemetry
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Mandatory Concurrency Test -->
+        <section id="tab-concurrency" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>🔒</span> Mandatory Concurrency Invariant Test</h2>
+                    <span class="tag tag-warning">CRITICAL EVALUATION GATE</span>
+                </div>
+                
+                <div class="concurrency-banner">
+                    <h3>Scenario Invariant Rule:</h3>
+                    <p>Account <strong>ACC1001</strong> starts with <strong>₹10,000.00</strong>. Two concurrent withdrawal requests arrive simultaneously from separate worker threads: <strong>Thread A requests ₹7,000</strong> and <strong>Thread B requests ₹5,000</strong>.</p>
+                    <p style="margin-top: 0.4rem; color: #1e40af; font-weight: 600;">Invariant to Prove: Both withdrawals must NOT succeed. Exactly one must succeed; the other must be rejected with <code>InsufficientBalanceException</code>. Final balance must remain strictly non-negative (₹3,000 or ₹5,000).</p>
+                </div>
+
+                <div style="text-align: center; margin: 1.5rem 0;">
+                    <button class="btn btn-success" id="btn-run-concurrency" onclick="runConcurrencyScenario()" style="font-size: 1.05rem; padding: 0.75rem 1.75rem;">
+                        ⚡ Fire Simultaneous Concurrency Test Now
+                    </button>
+                </div>
+
+                <div id="concurrency-results" style="display: none;">
+                    <div id="concurrency-verdict" style="padding: 1rem; border-radius: 8px; font-weight: 700; margin-bottom: 1.25rem;"></div>
+                    <div class="thread-result-box" id="thread-cards-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: 50,000+ Benchmark Suite -->
+        <section id="tab-benchmark" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>🚀</span> High-Volume Performance Benchmark Suite</h2>
+                    <span class="tag tag-success">1 / 5 / 10 / 20 WORKER THREADS</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+                    Execute comparable workloads across bounded thread configurations. Measures total processing time, throughput (TPS), success/failure counts, and DB bottlenecks.
+                </p>
+
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+                    <label for="bm-txn-count" style="font-weight: 600;">Workload Size:</label>
+                    <select id="bm-txn-count" class="form-control" style="width: 220px;">
+                        <option value="1000">1,000 Transactions (Quick Live Demo)</option>
+                        <option value="5000">5,000 Transactions (Standard)</option>
+                        <option value="10000">10,000 Transactions (Intensive)</option>
+                        <option value="50000">50,000 Transactions (Full Benchmark Spec)</option>
+                    </select>
+                    <button class="btn btn-success" id="btn-run-bm" onclick="runBenchmarkSuite()">
+                        ▶️ Run Performance Test Suite
+                    </button>
+                    <span id="bm-spinner" style="display: none; font-weight: 600; color: var(--accent);">⏳ Running benchmark across 1, 5, 10, and 20 worker pools...</span>
+                </div>
+
+                <div id="benchmark-results-container" style="display: none;">
+                    <div class="table-container" style="margin-bottom: 1.5rem;">
+                        <table id="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Worker Threads</th>
+                                    <th>Total Txns</th>
+                                    <th>Successful</th>
+                                    <th>Failed / Rejected</th>
+                                    <th>Total Time (ms)</th>
+                                    <th>Throughput (TPS)</th>
+                                    <th>Observed DB Bottleneck</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card" style="background: #f8fafc; border-left: 4px solid var(--accent);">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--primary);">Diminishing Returns & Bottleneck Analysis</h3>
+                        <pre id="bm-analysis-text" style="white-space: pre-wrap; font-family: inherit; font-size: 0.88rem; color: #334155;"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: SQL Reports & EXPLAIN -->
+        <section id="tab-reports" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><span>📊</span> 5 Mandatory SQL Analytical Reports & Query Plans</h2>
+                    <button class="btn btn-secondary" onclick="loadAllReports()">Refresh Reports</button>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; overflow-x: auto;">
+                    <button class="btn btn-secondary" onclick="showReport(1)">1. Top 10 Accounts Volume</button>
+                    <button class="btn btn-secondary" onclick="showReport(2)">2. Failed Grouped by Reason</button>
+                    <button class="btn btn-secondary" onclick="showReport(3)">3. Daily Volume by Type</button>
+                    <button class="btn btn-secondary" onclick="showReport(4)">4. Accounts with &gt;= N Txns</button>
+                    <button class="btn btn-secondary" onclick="showReport(5)">5. Customer Transaction History</button>
+                </div>
+
+                <div id="active-report-container">
+                    <h3 id="report-title" style="margin-bottom: 0.5rem;">Select a report above</h3>
+                    <div style="background: #1e293b; color: #f1f5f9; padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem;">
+                        <pre id="report-sql"></pre>
+                    </div>
+                    <div class="table-container">
+                        <table id="report-table">
+                            <thead id="report-thead"></thead>
+                            <tbody id="report-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 1rem; background: #e0f2fe; border: 1px solid #bae6fd; padding: 0.75rem; border-radius: 6px;">
+                        <h4 style="font-size: 0.85rem; color: #0369a1; margin-bottom: 0.25rem;">Query Execution Plan (EXPLAIN):</h4>
+                        <pre id="report-explain" style="white-space: pre-wrap; font-size: 0.8rem; font-family: monospace; color: #0c4a6e;"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: Audit & Failure Logs -->
+        <section id="tab-audit" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><span>📜</span> Transaction Audit Trail (<code>TRANSACTION_AUDIT</code>)</h2>
+                    </div>
+                    <div class="table-container" style="max-height: 450px; overflow-y: auto;">
+                        <table id="audit-table">
+                            <thead>
+                                <tr>
+                                    <th>Txn ID</th>
+                                    <th>Operation</th>
+                                    <th>Thread</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><span>⚠️</span> Failure Records (<code>FAILED_TRANSACTION</code>)</h2>
+                    </div>
+                    <div class="table-container" style="max-height: 450px; overflow-y: auto;">
+                        <table id="failed-table">
+                            <thead>
+                                <tr>
+                                    <th>Txn ID</th>
+                                    <th>Category</th>
+                                    <th>Error Code</th>
+                                    <th>Failure Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- AI Customer Support Chatbot Floating Widget -->
+    <div class="chatbot-bubble" onclick="toggleChatWindow()" title="Open Banking Support Assistant">
+        💬
+    </div>
+
+    <div class="chatbot-window hidden" id="chatbot-window">
+        <div class="chat-header">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>🤖</span>
+                <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700;">Banking AI Assistant</h4>
+                    <span style="font-size: 0.7rem; color: #94a3b8;">Online • Ready to assist</span>
+                </div>
+            </div>
+            <button onclick="toggleChatWindow()" style="background: none; border: none; color: white; font-size: 1.25rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg bot">
+                Hello! 👋 I am your <strong>Autonomous Banking Assistant</strong>.<br><br>
+                Ask me about:
+                <ul style="margin-left: 1.2rem; margin-top: 0.3rem;">
+                    <li>Live account balance (e.g., <em>"Balance of ACC1001"</em>)</li>
+                    <li>Transaction tracking (e.g., <em>"Status of TXN-INIT-001"</em>)</li>
+                    <li>How our concurrency engine prevents double-spending</li>
+                </ul>
+                <div class="chat-suggestions">
+                    <button class="suggestion-pill" onclick="sendQuickChat('Check balance of ACC1001')">Balance of ACC1001</button>
+                    <button class="suggestion-pill" onclick="sendQuickChat('Check balance of ACC2004')">Balance of ACC2004</button>
+                    <button class="suggestion-pill" onclick="sendQuickChat('What happens during concurrent withdrawals?')">Concurrency Rules</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question (e.g. balance of ACC1001)..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

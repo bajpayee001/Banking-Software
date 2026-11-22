@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: bank-transaction-system
+  datasource:
+    url: jdbc:h2:mem:bankdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+      idle-timeout: 30000
+      connection-timeout: 20000
+      pool-name: BankingHikariPool
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/seed.sql
+
+server:
+  port: 8080
+
+banking:
+  concurrency:
+    core-pool-size: 20
+    max-pool-size: 40
+    queue-capacity: 60000
+    thread-name-prefix: BankTxnWorker-
+
+logging:
+  level:
+    root: INFO
+    com.bank.transaction: DEBUG
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

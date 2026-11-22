@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bankdb
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
