@@ -81,24 +81,22 @@ bank-transaction-system/
     5. Verify Spring Boot context startup, database seed loading, and automated repository tests (`Day2DataAccessTest`).
   - **Checkpoint Day 2:** All seed records loaded and verified via automated repository tests; custom SQL queries for transaction history by customer, account search, and balance assertions execute cleanly. (Passed 100%)
   - **Daily Git Commit:** `feat(phase-1): day 2 - seed dataset, custom repository queries, user schema groundwork, and data access tests` (`4a380e0`)
-  - **Tasks:**
-    1. Populate `seed.sql` with multi-channel test accounts (active, frozen, zero balance, high net-worth).
-    2. Add specific test account `ACC1001` with exactly ₹10,000 for mandatory concurrency test.
-    3. Implement custom repository queries for account lookups, customer transaction histories, and balance updates.
-    4. Verify Spring Boot context startup and database initialization.
-  - **Checkpoint Day 2:** All seed records loaded and verified via automated repository tests.
 
 ---
 
 ### Phase 2: 🔐 Auth & 2FA (Days 3–4)
-- **Day 3: User/Admin Authentication, Role-Based Access Control (RBAC)**
+- **Day 3: User/Admin Authentication, Role-Based Access Control (RBAC) — [DONE ✅]**
   - **Estimated Time:** 4–5 hours | **Priority:** P1
   - **Tasks:**
-    1. Add Spring Security & JWT dependencies.
-    2. Create `User` and `Role` entities (`ROLE_USER`, `ROLE_ADMIN`).
-    3. Build `JwtAuthenticationFilter`, `JwtTokenProvider`, and `SecurityConfig`.
-    4. Implement `/api/auth/login` and `/api/auth/register` endpoints.
-  - **Checkpoint Day 3:** JWT issued on valid login; authenticated endpoints reject unauthenticated requests with 401.
+    1. Add Spring Security starter & test dependencies to `pom.xml` and `build.gradle`.
+    2. Configure `BCryptPasswordEncoder` bean and initialize deterministic test credentials (`Admin@123`, `User@123`).
+    3. Implement `CustomUserDetails` and `CustomUserDetailsService` loading users from `UserRepository`.
+    4. Build stateless HMAC-SHA256 `JwtTokenProvider` and `JwtAuthenticationFilter`.
+    5. Configure `SecurityConfig` with stateless session management, CSRF disable, and public/secured route separation.
+    6. Implement `AuthService` and `AuthController` with endpoints (`login`, `registerUser`, `createAdmin`, `getCurrentUserProfile`).
+    7. Implement `AdminController` with `@PreAuthorize("hasRole('ADMIN')")` for system metrics and account freezing.
+  - **Checkpoint Day 3:** `Day3AuthSecurityTest` passes 100% — Admin login receives JWT with `ROLE_ADMIN`, User login receives `ROLE_USER`, invalid passwords return 401, dynamic user and admin provisioning verified.
+  - **Daily Git Commit:** `feat(phase-2): day 3 - spring security, jwt authentication, rbac, and admin/user registration endpoints`
 
 - **Day 4: Two-Factor Authentication (2FA) & Role-Secured Endpoints**
   - **Estimated Time:** 3–4 hours | **Priority:** P1

@@ -15,6 +15,45 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        log.warn("Authentication failure: {}", ex.getMessage());
+        ErrorResponse response = new ErrorResponse(
+                null,
+                "ERR_AUTHENTICATION_FAILED",
+                "SECURITY_ERROR",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+        ErrorResponse response = new ErrorResponse(
+                null,
+                "ERR_ACCESS_DENIED",
+                "SECURITY_ERROR",
+                "Access denied: Insufficient privileges to perform this operation",
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Invalid input argument: {}", ex.getMessage());
+        ErrorResponse response = new ErrorResponse(
+                null,
+                "ERR_INVALID_ARGUMENT",
+                "VALIDATION_ERROR",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BankingException.class)
     public ResponseEntity<ErrorResponse> handleBankingException(BankingException ex) {
         log.warn("Banking business exception caught: code={}, category={}, message={}",
