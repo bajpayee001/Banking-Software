@@ -131,7 +131,7 @@ erDiagram
   5. Complete transaction history for a customer
 
 ### 6. AI Customer Support Chatbot
-- Click the **💬** bubble in the bottom right corner of the UI.
+
 - Ask questions like:
   - *"What is the balance of ACC1001?"*
   - *"What is the status of TXN-INIT-001?"*
