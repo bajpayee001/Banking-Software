@@ -47,8 +47,15 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico").permitAll()
                 // In-memory H2 database console for development
                 .requestMatchers("/h2-console/**").permitAll()
-                // Admin-only endpoints
+                // Admin-only endpoints (system health, benchmark triggers, concurrency simulator)
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/benchmark/**").hasRole("ADMIN")
+                .requestMatchers("/api/concurrency/**").hasRole("ADMIN")
+                // User & Admin secured business API endpoints
+                .requestMatchers("/api/transactions/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/accounts/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/reports/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/ai/**").hasAnyRole("USER", "ADMIN")
                 // All other business API endpoints require authentication
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()

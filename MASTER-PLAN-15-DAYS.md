@@ -84,7 +84,7 @@ bank-transaction-system/
 
 ---
 
-### Phase 2: 🔐 Auth & 2FA (Days 3–4)
+### Phase 2: 🔐 Auth & 2FA (Days 3–4) — [COMPLETED ✅]
 - **Day 3: User/Admin Authentication, Role-Based Access Control (RBAC) — [DONE ✅]**
   - **Estimated Time:** 4–5 hours | **Priority:** P1
   - **Tasks:**
@@ -95,16 +95,19 @@ bank-transaction-system/
     5. Configure `SecurityConfig` with stateless session management, CSRF disable, and public/secured route separation.
     6. Implement `AuthService` and `AuthController` with endpoints (`login`, `registerUser`, `createAdmin`, `getCurrentUserProfile`).
     7. Implement `AdminController` with `@PreAuthorize("hasRole('ADMIN')")` for system metrics and account freezing.
-  - **Checkpoint Day 3:** `Day3AuthSecurityTest` passes 100% — Admin login receives JWT with `ROLE_ADMIN`, User login receives `ROLE_USER`, invalid passwords return 401, dynamic user and admin provisioning verified.
+  - **Checkpoint Day 3:** `Day3AuthSecurityTest` and `Day3SecurityEdgeCasesTest` pass 100% — Admin login receives JWT with `ROLE_ADMIN`, User login receives `ROLE_USER`, invalid passwords return 401, dynamic user and admin provisioning verified. (11 tests passed)
   - **Daily Git Commit:** `feat(phase-2): day 3 - spring security, jwt authentication, rbac, and admin/user registration endpoints`
 
-- **Day 4: Two-Factor Authentication (2FA) & Role-Secured Endpoints**
+- **Day 4: Two-Factor Authentication (2FA) & Role-Secured Endpoints — [DONE ✅]**
   - **Estimated Time:** 3–4 hours | **Priority:** P1
   - **Tasks:**
-    1. Implement TOTP/OTP verification service for 2FA.
-    2. Secure admin endpoints (benchmark trigger, system-wide reports) for `ROLE_ADMIN` only.
-    3. Secure user endpoints (deposit, withdraw, transfer, statement) for `ROLE_USER`.
-  - **Checkpoint Day 4:** Role-based access control tests verify user vs admin permission boundaries.
+    1. Implement RFC 6238 compliant TOTP verification service (`TwoFactorAuthService`) with Base32 encoding and HMAC-SHA1 dynamic truncation.
+    2. Add tolerance window (+/- 1 step, 30s drift) for reliable OTP validation.
+    3. Build 2FA lifecycle endpoints in `AuthController` (`/api/auth/2fa/generate`, `/api/auth/2fa/enable`, `/api/auth/2fa/verify`, `/api/auth/2fa/disable`).
+    4. Secure administrative endpoints (`/api/admin/**`, `/api/benchmark/**`, `/api/concurrency/**`) for `ROLE_ADMIN` only.
+    5. Secure business operations (`/api/transactions/**`, `/api/accounts/**`, `/api/reports/**`, `/api/ai/**`) for authenticated users (`ROLE_USER`, `ROLE_ADMIN`).
+  - **Checkpoint Day 4:** `Day4TwoFactorAuthTest` passes 100% (7/7 tests) — TOTP computation, clock drift tolerance, 2FA lifecycle, QR provisioning URL, and RBAC endpoint boundaries verified.
+  - **Daily Git Commit:** `feat(phase-2): day 4 - 2fa totp verification service, endpoints, and role-secured access control`
 
 ---
 
