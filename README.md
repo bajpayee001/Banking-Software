@@ -98,38 +98,6 @@ erDiagram
 
 ---
 
-## 💻 How to Open & Run in IntelliJ IDEA
-
-### Step 1: Open Project in IntelliJ IDEA
-1. Launch **IntelliJ IDEA**.
-2. Click **File -> Open...** (or click **Open** on the Welcome screen).
-3. Navigate to:
-   ```
-   C:\Users\parth\.gemini\antigravity\scratch\bank-transaction-system
-   ```
-4. Click **OK**.
-5. IntelliJ will detect both `pom.xml` and `build.gradle`:
-   - If prompted: choose **Open as Project** (select either **Maven** or **Gradle**). Both are fully supported!
-
-### Step 2: Configure Project SDK
-1. Go to **File -> Project Structure... -> Project**.
-2. Set **SDK** to **Java 17** or **Java 21** (e.g. your installed OpenJDK 21).
-3. Set **Language Level** to **SDK Default** (or **17+**).
-4. Click **Apply** and **OK**.
-
-### Step 3: Run the Application
-1. In the Project Explorer, expand:
-   `src/main/java/com/bank/transaction/BankTransactionApplication.java`
-2. Right-click on `BankTransactionApplication` and select **Run 'BankTransactionApplication.main()'** (or press `Shift + F10`).
-3. You will see the Spring Boot banner and HikariCP connection pool initialize on port `8080`.
-
-### Step 4: Open the Web UI Dashboard
-Open your browser and navigate to:
-```
-http://localhost:8080
-```
-
----
 
 ## ⚡ Key Demonstration Scenarios
 
